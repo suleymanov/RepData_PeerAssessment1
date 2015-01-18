@@ -1,3 +1,6 @@
+## (Note from student, Rail Suleymanov)
+Note that I used Russian characters in last part of the assignment to have it compatible with my OS language (weekend names - Saturday and Sunday).
+
 ## Introduction
 
 It is now possible to collect a large amount of data about personal
