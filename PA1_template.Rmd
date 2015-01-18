@@ -1,25 +1,109 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
-
 
 ## Loading and preprocessing the data
-
-
+```{r load_data, results='hide'}
+data_fname <- "activity.csv"
+zipfile <- "activity.zip"
+if (!file.exists(data_fname)) {
+    unzip(zipfile)
+    }
+data <- read.csv(data_fname)
+options(scipen = 1, digits = 2)
+```
 
 ## What is mean total number of steps taken per day?
+```{r mean_steps}
+is_na <- is.na(data$steps)
+data1 <- data[!is_na,]
+data2 <- aggregate(data1$steps, by = list(data1$date), FUN = "sum")
+names(data2) <- c("date", "steps")
+data2$date <- as.Date(data2$date)
+main <- "Histogram of steps per day"
+xlab <- "Total number of steps"
+hist(data2$steps, col = "red", main = main, xlab = xlab, breaks = 10)
+mean <- mean(data2$steps)
+median <- median(data2$steps)
+```
+Mean number of steps per day is `r mean`.
 
-
+Median number of seps per day is `r median`.
 
 ## What is the average daily activity pattern?
-
-
+```{r daily_activity}
+data3 <- aggregate(data1$steps, by = list(data1$interval), FUN = "ave")
+names(data3) <- c("interval", "steps_ave")
+data3$steps_ave <- data3$steps_ave[,1]
+xlab = "5-minute interval"
+ylab = "Average number of steps"
+plot(data3$interval, data3$steps_ave, type = "l", xlab = xlab, ylab = ylab)
+pmax <- which.max(data3[,2])
+interval <- data3$interval[pmax]
+```
+5-minute interval '`r interval`' contains the maximum number of steps on average.
 
 ## Imputing missing values
+```{r impute_missing_values}
+nas <- dim(data)[1] - dim(data1)[1]
+data4 <- data.frame(date = data$date, interval = data$interval, steps <- data$steps)
+for (i in seq(is_na)) {
+    if (is_na[i]) {
+        interval <- data4$interval[i]
+        ind <- match(interval, data3$interval)
+        data4$steps[i] <- as.integer(data3$steps[ind])
+    }
+}
+data5 <- aggregate(data4$steps, by = list(data4$date), FUN = "sum")
+names(data5) <- c("date", "steps")
+main <- "Histogram of steps per day (filled dataset)"
+xlab <- "Total number of steps"
+hist(data5$steps, col = "red", main = main, xlab = xlab, breaks = 10)
+mean2 <- mean(data5$steps)
+median2 <- median(data5$steps)
+mean_change <- 100 * abs(mean - mean2) / mean
+median_change <- 100 * abs(median - median2) / median
+diff1 <- 100 * abs(mean - median) / mean
+diff2 <- 100 * abs(mean2 - median2) / mean2
+```
+Total number of missing values: `r nas`.
 
+To replace missing values (NA), I choose average for that 5-minute interval across all days.
 
+Mean number of steps per day in filled dataset is `r mean2`.
+
+Median number of steps per day in filled dataset is `r median2`.
+
+After filling mean value has changed by `r mean_change` (%).
+
+Median value has changed by `r median_change` (%).
+
+Before filling median-mean difference was `r diff1` (%).
+
+After filling median-mean difference became `r diff2` (%).
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r pattern_differences, fig.height=10}
+data4$date <- as.Date(data4$date)
+days <- vector("character", length = length(data4$date))
+for (i in seq(days)) {
+    day <- weekdays(data4$date[i])
+    if (day == "суббота" || day == "воскресенье") {
+        days[i] <- "weekend"
+    }
+    else {
+        days[i] <- "weekday"
+    }
+}
+data4$days <- days
+data_weekday <- data4[data4$days == "weekday",]
+data_weekend <- data4[data4$days == "weekend",]
+data6 <- aggregate(data_weekday$steps, by = list(data_weekday$interval), FUN = "mean")
+names(data6) <- c("interval", "steps_ave")
+xlab = "5-minute interval"
+ylab = "Average number of steps"
+data7 <- aggregate(data_weekend$steps, by = list(data_weekend$interval), FUN = "mean")
+names(data7) <- c("interval", "steps_ave")
+par(mfrow = c(2, 1))
+ttl = "weekday"
+plot(data6$interval, data6$steps_ave, type = "l", xlab = xlab, ylab = ylab, main = ttl)
+ttl = "weekend"
+plot(data7$interval, data7$steps_ave, type = "l", xlab = xlab, ylab = ylab, main = ttl)
+```
