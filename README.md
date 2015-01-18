@@ -1,5 +1,5 @@
 ## (Note from student, Rail Suleymanov)
-Note that I used Russian characters in last part of the assignment to have it compatible with my OS language (weekend names - Saturday and Sunday).
+Note that I used Russian characters in last part of the assignment to have it compatible with my OS language (weekend names - "Суббота" and "Воскресенье" instead of "Saturday" and "Sunday").
 
 ## Introduction
 

@@ -80,7 +80,7 @@ Before filling median-mean difference was `r diff1` (%).
 After filling median-mean difference became `r diff2` (%).
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r pattern_differences, fig.height=10}
+```{r pattern_differences, fig.height=9}
 data4$date <- as.Date(data4$date)
 days <- vector("character", length = length(data4$date))
 for (i in seq(days)) {
